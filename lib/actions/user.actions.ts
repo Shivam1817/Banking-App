@@ -12,7 +12,7 @@ import { addFundingSource, createDwollaCustomer } from "./dwolla.action";
 const {
     APPWRITE_DATABASE_ID: DATABASE_ID,
     APPWRITE_USER_COLLECTION_ID: USER_COLLECTION_ID,
-    APPWRITE_BANK_COLLECTION_ID: USER_BANK_ID,
+    APPWRITE_BANK_COLLECTION_ID: BANK_COLLECTION_ID,
 } = process.env;
 
 export const signIn = async({ email , password }: signInProps ) => {
@@ -48,7 +48,7 @@ export const signUp = async({ password, ...userData}: SignUpParams) => {
     
     if(!dwollaCustomerUrl) throw new Error('Error creating Dwolla customer')
     
-    const dwollaCustomerId = extractCustomerIdFromUrl(dwollaCustomerUrl)
+    const dwollaCustomerId = extractCustomerIdFromUrl(dwollaCustomerUrl);
 
     const newUser = await database.createDocument(
         DATABASE_ID!,
@@ -83,6 +83,7 @@ export async function getLoggedInUser() {
         const user =  await account.get();
         return parseStringify(user);
     } catch (error) {
+        console.log(error)
         return null;
     }
 }
@@ -100,20 +101,21 @@ export const logoutAccount = async () => {
 
 export const createLinkToken = async (user: User) => {
     try {
-        const tokenParams = {
-            user: {
-                client_user_id: user.$id
-            },
-            client_name: `${user.firstName} ${user.lastName}`,
-            products: ['auth'] as Products[],
-            Language: 'en',
-            country_codes: ['US'] as CountryCode[],
-        }
-        const response = await plaidClient.linkTokenCreate(tokenParams);
+    const tokenParams = {
+        user: {
+        client_user_id: user.$id
+        },
+        client_name: `${user.firstName} ${user.lastName}`,
+        products: ['auth'] as Products[],
+        language: 'en',
+        country_codes: ['US'] as CountryCode[],
+    }
 
-        return parseStringify({ linkToken: response.data.link_token })
+    const response = await plaidClient.linkTokenCreate(tokenParams);
+
+    return parseStringify({ linkToken: response.data.link_token })
     } catch (error) {
-        console.log(error);
+    console.log(error);
     }
 }
 
@@ -130,7 +132,7 @@ export const createBankAccount = async ({
 
         const bankAccount = await database.createDocument(
             DATABASE_ID!,
-            USER_COLLECTION_ID!,
+            BANK_COLLECTION_ID!,
             ID.unique(),
             {
                 userId,
@@ -144,7 +146,7 @@ export const createBankAccount = async ({
 
         return parseStringify(bankAccount);
     } catch (error) {
-        
+        console.log(error);
     }
 }
 

@@ -46,20 +46,21 @@ const Authform = ({type}: { type: string }) => {
       //Sign up with Appwrite & create plain link token
       
 
-      if(type === 'sign-up'){
+      if(type === 'sign-up') {
         const userData = {
           firstName: data.firstName!,
           lastName: data.lastName!,
-          address: data.address!,
+          address1: data.address!,
           city: data.city!,
           state: data.state!,
-          postalcode: data.postalCode!,
-          dateofBirth: data.dateOfBirth!,
+          postalCode: data.postalCode!,
+          dateOfBirth: data.dateOfBirth!,
           ssn: data.ssn!,
           email: data.email,
           password: data.password
         }
-        const newUser = await signUp(data);
+        const newUser = await signUp(userData);
+
         setUser(newUser);
       }
       if(type === 'sign-in'){
